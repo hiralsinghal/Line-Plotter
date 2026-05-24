@@ -35,7 +35,7 @@ double ask_for_data(char *question) {
     while(1) {
         char input_buffer[10];
 
-        printf("Enter %s: " question);
+        printf("Enter %s: ", question);
         fgets(input_buffer, 10, stdin);
 
         char *temp_pointer = strchr(input_buffer, '\n');
@@ -82,54 +82,12 @@ int *calc_y_bounds(double slope, double y_intercept) {
     return arr;
 }
 
-int draw_graph(double slope, double y_intercept) {
-    char *screen_buffer = malloc((WIDTH + 1) * HEIGHT + 1);
-
-    make_screen_array(screen_buffer);
-    int *bounds = calc_y_bounds(slope, y_intercept);
-
-    free(screen_buffer);
-    free(bounds);
-
-    return 0;
-}
-
-int x_axis_location;
-    if (bounds[0] == bounds[1]) {
-        x_axis_location = (HEIGHT / 2) - y_intercept;
-    } else {
-        double x_axis_ratio = (0.0 - bounds[0]) / (bounds[1] - bounds[0]);
-        x_axis_location = (int)((HEIGHT - 1) * x_axis_ratio);
-    }
-    if (x_axis_location < 0) x_axis_location = 0;
-    if (x_axis_location > HEIGHT - 1) x_axis_location = HEIGHT - 1;
-
-for (int i = 0; i < WIDTH; i++) {
-    draw_symbol(i, x_axis_location, screen_buffer, "-");
-}
-
-for (int i = 0; i < WIDTH; i++) {
-    double_y = slope * i + y_intercept;
-
-    int normal_y;
-    if (bounds[0] == bounds[1]) {
-        normal_y = HEIGHT / 2;
-    } else {
-        normal_y = (int)((HEIGHT - 1) * ((y - bounds[0]) / (bounds[1] - bounds[0])));
-    }
-
-    if (normal_y < 0) normal_y = 0;
-    if (normal_y > HEIGHT - 1) normal_y = HEIGHT - 1;
-
-    draw_symbol(i, normal_y, screen_buffer, 'o');
-}
-
 int draw_max_min_scale(int *bounds, char *screen_buffer) {
     int min = bounds[0], max = bounds[1];
     char min_string[20], max_string[20];
 
     if (min == max) {
-        snprint(max_string, sizeof(max_string), "%d", max);
+        snprintf(max_string, sizeof(max_string), "%d", max);
 
         int location = (HEIGHT / 2) * (WIDTH + 1);
         size_t flat_len = strlen(max_string);
@@ -168,6 +126,52 @@ int draw_max_min_scale(int *bounds, char *screen_buffer) {
 
     return 0;
 }
+
+int draw_graph(double slope, double y_intercept) {
+    char *screen_buffer = malloc((WIDTH + 1) * HEIGHT + 1);
+
+    make_screen_array(screen_buffer);
+    int *bounds = calc_y_bounds(slope, y_intercept);
+
+    free(screen_buffer);
+    free(bounds);
+
+    int x_axis_location;
+    if (bounds[0] == bounds[1]) {
+        x_axis_location = (HEIGHT / 2) - y_intercept;
+    } else {
+        double x_axis_ratio = (0.0 - bounds[0]) / (bounds[1] - bounds[0]);
+        x_axis_location = (int)((HEIGHT - 1) * x_axis_ratio);
+    }
+    if (x_axis_location < 0) x_axis_location = 0;
+    if (x_axis_location > HEIGHT - 1) x_axis_location = HEIGHT - 1;
+
+    for (int i = 0; i < WIDTH; i++) {
+        draw_symbol(i, x_axis_location, screen_buffer, '-');
+    }
+
+    for (int i = 0; i < WIDTH; i++) {
+        double y = slope * i + y_intercept;
+
+        int normal_y;
+        if (bounds[0] == bounds[1]) {
+            normal_y = HEIGHT / 2;
+        } else {
+            normal_y = (int)((HEIGHT - 1) * ((y - bounds[0]) / (bounds[1] - bounds[0])));
+        }
+
+        if (normal_y < 0) normal_y = 0;
+        if (normal_y > HEIGHT - 1) normal_y = HEIGHT - 1;
+
+        draw_symbol(i, normal_y, screen_buffer, 'o');
+    }
+
+    draw_max_min_scale(bounds, screen_buffer);
+
+    return 0;
+}
+
+
 
 int main() {
     double slope = ask_for_data("slope");
