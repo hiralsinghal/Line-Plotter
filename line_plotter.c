@@ -24,7 +24,7 @@ int make_screen_array(char *screen_buffer) {
             strcat(screen_buffer, " ");
         }
         if (y < HEIGHT - 1) {
-            strcat(screen_buffer, "\n")
+            strcat(screen_buffer, "\n");
         }
     }
 
@@ -95,14 +95,14 @@ int draw_graph(double slope, double y_intercept) {
 }
 
 int x_axis_location;
-if (bounds[0] == bounds[1]) {
-    x_axis_location = (HEIGHT / 2) - y_intercept;
-} else {
-    double x_axis_ratio = (0.0 - bounds[0]) / (bounds[1] - bounds[0]);
-    x_axis_location = (int)((HEIGHT - 1) * x_axis_ratio);
-}
-if (x_axis_location < 0) x_axis_location = 0;
-if (x_axis_location > HEIGHT - 1) x_axis_location = HEIGHT - 1;
+    if (bounds[0] == bounds[1]) {
+        x_axis_location = (HEIGHT / 2) - y_intercept;
+    } else {
+        double x_axis_ratio = (0.0 - bounds[0]) / (bounds[1] - bounds[0]);
+        x_axis_location = (int)((HEIGHT - 1) * x_axis_ratio);
+    }
+    if (x_axis_location < 0) x_axis_location = 0;
+    if (x_axis_location > HEIGHT - 1) x_axis_location = HEIGHT - 1;
 
 for (int i = 0; i < WIDTH; i++) {
     draw_symbol(i, x_axis_location, screen_buffer, "-");
@@ -180,7 +180,7 @@ int main() {
 
     char *screen_buffer = malloc((WIDTH + 1) * HEIGHT + 1);
     make_screen_array(screen_buffer);
-    draw_symbol(10, 10, screen_buffer, 'o')
+    draw_symbol(10, 10, screen_buffer, 'o');
 
     SLEEP(5);
     CLEAR_SCREEN();
