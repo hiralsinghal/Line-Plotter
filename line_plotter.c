@@ -17,6 +17,17 @@
 #define HEIGHT 30
 #define WIDTH 100
 
+const char *get_color_code(const char *color) {
+    if (strcmp(color, "red") == 0) return "\x1b[31m";
+    if (strcmp(color, "green") == 0) return "\x1b[32m";
+    if (strcmp(color, "yellow") == 0) return "\x1b[33m";
+    if (strcmp(color, "blue") == 0) return "\x1b[34m";
+    if (strcmp(color, "magenta") == 0) return "\x1b[35m";
+    if (strcmp(color, "cyan") == 0) return "\x1b[36m";
+    if (strcmp(color, "white") == 0) return "\x1b[37m";
+    return "\x1b[0m";
+}
+
 int make_screen_array(char *screen_buffer) {
     screen_buffer[0] = '\0';
     for (int y = 0; y < HEIGHT; y++) {
@@ -128,7 +139,7 @@ int draw_max_min_scale(int *bounds, char *screen_buffer) {
     return 0;
 }
 
-int draw_graph(double slope, double y_intercept) {
+int draw_graph(double slope, double y_intercept, const char *axis_color, const char *line_color) {
     char *screen_buffer = malloc((WIDTH + 1) * HEIGHT + 1);
     if (screen_buffer == NULL) {
         return 1;
@@ -151,10 +162,13 @@ int draw_graph(double slope, double y_intercept) {
     if (x_axis_location < 0) x_axis_location = 0;
     if (x_axis_location > HEIGHT - 1) x_axis_location = HEIGHT - 1;
 
+    printf("%s", get_color_code(axis_color));
     for (int i = 0; i < WIDTH; i++) {
         draw_symbol(i, x_axis_location, screen_buffer, '-');
     }
+    printf("\x1b[0m");
 
+    printf("%s", get_color_code(line_color));
     for (int i = 0; i < WIDTH; i++) {
         double y = slope * i + y_intercept;
 
@@ -170,6 +184,7 @@ int draw_graph(double slope, double y_intercept) {
 
         draw_symbol(i, normal_y, screen_buffer, 'o');
     }
+    printf("\x1b[0m");
 
     draw_max_min_scale(bounds, screen_buffer);
 
@@ -183,11 +198,20 @@ int main() {
     double slope = ask_for_data("slope");
     double y_intercept = ask_for_data("y_intercept");
 
+    char axis_color[20];
+    char line_color[20];
+
+    printf("Enter a color for axis: ");
+    scanf("%19s", axis_color);
+
+    printf("Enter a color for line: ");
+    scanf("%19s", line_color);
+
     printf("\x1b[8;%d;%dt", HEIGHT + 1, WIDTH + 2);
     printf("\x1b[?25l");
     CLEAR_SCREEN();
 
-    draw_graph(slope, y_intercept);
+    draw_graph(slope, y_intercept, axis_color, line_color);
 
     SLEEP(5);
     CLEAR_SCREEN();
