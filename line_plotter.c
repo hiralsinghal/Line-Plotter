@@ -32,7 +32,7 @@ int make_screen_array(char *screen_buffer) {
 }
 
 double ask_for_data(char *question) {
-    while(1) {
+    while (1) {
         char input_buffer[10];
 
         printf("Enter %s: ", question);
@@ -43,7 +43,7 @@ double ask_for_data(char *question) {
 
         double output = strtod(input_buffer, &temp_pointer);
 
-        if(*temp_pointer == '\0') {
+        if (*temp_pointer == '\0') {
             return output;
         } else {
             printf("Please enter a number!\n");
@@ -56,12 +56,13 @@ int draw_symbol(int ball_x, int ball_y, char *screen_buffer, char symbol) {
         return 1;
     }
 
+    ball_y = -(ball_y - (HEIGHT - 1));
+
     int location = ball_y * (WIDTH + 1) + ball_x;
     screen_buffer[location] = symbol;
 
     printf("\x1b[H");
     printf("%s", screen_buffer);
-
     fflush(stdout);
 
     return 0;
@@ -129,16 +130,20 @@ int draw_max_min_scale(int *bounds, char *screen_buffer) {
 
 int draw_graph(double slope, double y_intercept) {
     char *screen_buffer = malloc((WIDTH + 1) * HEIGHT + 1);
+    if (screen_buffer == NULL) {
+        return 1;
+    }
 
     make_screen_array(screen_buffer);
     int *bounds = calc_y_bounds(slope, y_intercept);
-
-    free(screen_buffer);
-    free(bounds);
+    if (bounds == NULL) {
+        free(screen_buffer);
+        return 1;
+    }
 
     int x_axis_location;
     if (bounds[0] == bounds[1]) {
-        x_axis_location = (HEIGHT / 2) - y_intercept;
+        x_axis_location = (HEIGHT / 2) - (int)y_intercept;
     } else {
         double x_axis_ratio = (0.0 - bounds[0]) / (bounds[1] - bounds[0]);
         x_axis_location = (int)((HEIGHT - 1) * x_axis_ratio);
@@ -168,23 +173,21 @@ int draw_graph(double slope, double y_intercept) {
 
     draw_max_min_scale(bounds, screen_buffer);
 
+    free(screen_buffer);
+    free(bounds);
+
     return 0;
 }
-
-
 
 int main() {
     double slope = ask_for_data("slope");
     double y_intercept = ask_for_data("y_intercept");
-    
-    // terminal
-    printf("\x1b[8;%d;%dt", HEIGHT +1, WIDTH +2);
+
+    printf("\x1b[8;%d;%dt", HEIGHT + 1, WIDTH + 2);
     printf("\x1b[?25l");
     CLEAR_SCREEN();
 
-    char *screen_buffer = malloc((WIDTH + 1) * HEIGHT + 1);
-    make_screen_array(screen_buffer);
-    draw_symbol(10, 10, screen_buffer, 'o');
+    draw_graph(slope, y_intercept);
 
     SLEEP(5);
     CLEAR_SCREEN();
